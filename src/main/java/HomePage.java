@@ -12,7 +12,7 @@ public class HomePage extends BasePage {
     }
 
     public void searchProduct(String productName){
-        writeText(searchBox, productName)
+        writeText(searchBox, productName);
         click (searchButton);
     }
     public void navigateToSubcategory(){
