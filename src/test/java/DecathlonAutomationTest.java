@@ -23,6 +23,7 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductListingPage plp = new ProductListingPage(driver);
 
         homePage.navigateToSubcategory();
+        plp.applyColorFilter();
         Assert.assertTrue(plp.getProductCount() >= 0);
     }
 
@@ -49,6 +50,8 @@ public class DecathlonAutomationTest extends BaseTest {
         pdp.goToCart();
 
         Assert.assertTrue(cartPage.isCartPageOpened(), "Navigimi në faqen e Cart dështoi!");
+        Assert.assertFalse(cartPage.getFirstItemTitle().isEmpty(), "Titulli i produktit në shportë është bosh!");
+        Assert.assertTrue(cartPage.getOrderTotal() > 0, "Totali i shportës duhet të jetë më i madh se 0!");
     }
 
     @Test(priority = 5, dependsOnMethods = {"testScenario4_AddToCartAndTotals"}, description = "Test 5: Update cart quantities")
@@ -65,6 +68,6 @@ public class DecathlonAutomationTest extends BaseTest {
     public void testScenario6_EmptyTheCart() {
         CartPage cartPage = new CartPage(driver);
         cartPage.deleteFirstItem();
-        Assert.assertTrue(cartPage.getEmptyCartMessage().toLowerCase().contains("empty") || true);
+        Assert.assertTrue(cartPage.getEmptyCartMessage().toLowerCase().contains("empty") || cartPage.getCartRowsCount() == 0);
     }
 }
