@@ -125,6 +125,6 @@ Files are named dynamically using the test method name for easy debugging (e.g.,
 Any bugs or functional anomalies discovered during manual/automation runs have been documented into formal Bug Tickets and included in PDF format inside the bug_reports/ folder.
 
 ## ✉️ Contact & Submission
-Author: Ardit Ceno
+**Author: Ardit Ceno**
 
-## Submitted to: Lufthansa Industry Solutions 
+**Submitted to: Lufthansa Industry Solutions** 
