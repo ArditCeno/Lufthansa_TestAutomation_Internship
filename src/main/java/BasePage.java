@@ -1,4 +1,5 @@
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -13,20 +14,31 @@ public class BasePage {
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(12));
     }
 
-    // Metoda që mungonte për marrjen e listave të elementëve
     protected List<WebElement> getElements(By locator) {
         return driver.findElements(locator);
     }
 
     protected List<WebElement> getVisibleElements(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+        try {
+            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(locator));
+        } catch (Exception ignored) {}
+
+        return driver.findElements(locator).stream()
+                .filter(WebElement::isDisplayed)
+                .toList();
     }
 
     protected void click(By locator) {
-        wait.until(ExpectedConditions.elementToBeClickable(locator)).click();
+        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(locator));
+        try {
+            el.click();
+        } catch (Exception e) {
+
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
+        }
     }
 
     protected void writeText(By locator, String text) {
@@ -40,10 +52,6 @@ public class BasePage {
     }
 
     protected boolean isElementPresent(By locator) {
-        try {
-            return !driver.findElements(locator).isEmpty();
-        } catch (Exception e) {
-            return false;
-        }
+        return !driver.findElements(locator).isEmpty();
     }
 }

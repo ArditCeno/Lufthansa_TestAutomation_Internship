@@ -10,11 +10,11 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductDetailPage pdp = new ProductDetailPage(driver);
 
         homePage.searchProduct("backpack");
-        Assert.assertTrue(plp.getProductCount() > 0, "No products found!");
+        Assert.assertTrue(plp.getProductCount() > 0, "Nuk u gjet asnjë produkt!");
 
         plp.clickFirstProduct();
-        Assert.assertFalse(pdp.getProductTitle().isEmpty(), "Product title is empty!");
-        Assert.assertTrue(pdp.isAddToCartButtonPresent(), "Add to Cart button missing!");
+        Assert.assertFalse(pdp.getProductTitle().isEmpty(), "Titulli i produktit është bosh!");
+        Assert.assertTrue(pdp.isAddToCartButtonPresent(), "Butoni Add to Cart mungon!");
     }
 
     @Test(priority = 2, description = "Test 2: Category filters")
@@ -48,7 +48,7 @@ public class DecathlonAutomationTest extends BaseTest {
         pdp.clickAddToCart();
         pdp.goToCart();
 
-        Assert.assertTrue(cartPage.isCartPageOpened(), "Failed to navigate to Cart page!");
+        Assert.assertTrue(cartPage.isCartPageOpened(), "Navigimi në faqen e Cart dështoi!");
     }
 
     @Test(priority = 5, dependsOnMethods = {"testScenario4_AddToCartAndTotals"}, description = "Test 5: Update cart quantities")

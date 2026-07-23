@@ -28,7 +28,7 @@ public class BaseTest {
         options.addArguments("--remote-allow-origins=*");
 
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(8));
         driver.get("https://www.decathlon.com/");
     }
 
@@ -57,7 +57,7 @@ public class BaseTest {
 
         try {
             Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Screenshot saved for failed test: " + destFile.getAbsolutePath());
+            System.out.println("Screenshot u ruajt për testin e dështuar: " + destFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
