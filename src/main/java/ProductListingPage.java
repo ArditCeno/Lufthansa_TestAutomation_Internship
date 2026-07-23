@@ -10,12 +10,12 @@ import java.util.List;
 
 public class ProductListingPage extends BasePage {
 
-    private final By resultsHeading = By.cssSelector("h1, .search-title, .de-Heading");
-    private final By productTiles = By.cssSelector("main a[href*='/products/'], .product-tile, .de-ProductTile");
-    private final By colorFilterCheckbox = By.xpath("//*[contains(text(),'Blue') or contains(text(),'Black')]");
-    private final By priceFilterRange = By.xpath("//*[contains(text(),'$20') or contains(text(),'$50')]");
-    private final By productPrices = By.cssSelector(".price, .de-Price, [data-test='product-price']");
-    private final By sortDropdown = By.cssSelector("select[id*='sort'], select[name*='sort']");
+    private final By resultsHeading = By.cssSelector("div[role='status']");
+    private final By productTiles = By.cssSelector("#predictive-search-products a, main a[href*='/products/']");
+    private final By colorFilterCheckbox = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
+    private final By priceFilterGte = By.cssSelector("input[name='filter.v.price.gte']");
+    private final By sortDropdown = By.cssSelector("select#SortBy, select[name='sort_by']");
+    private final By productPrices = By.cssSelector(".price-item--regular, [data-testid='product-price']");
 
     public ProductListingPage(WebDriver driver) {
         super(driver);
@@ -55,8 +55,8 @@ public class ProductListingPage extends BasePage {
         try { click(colorFilterCheckbox); } catch (Exception ignored) {}
     }
 
-    public void applyPriceFilter() {
-        try { click(priceFilterRange); } catch (Exception ignored) {}
+    public void applyPriceFilter(String minPrice) {
+        try { writeText(priceFilterGte, minPrice); } catch (Exception ignored) {}
     }
 
     public void selectSortOption(String optionText) {
