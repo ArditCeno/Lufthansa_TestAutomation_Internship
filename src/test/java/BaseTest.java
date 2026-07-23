@@ -7,6 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -14,7 +15,7 @@ public class BaseTest {
     protected WebDriver driver;
 
     @BeforeMethod
-    public void setup(){
+    public void setup() {
         WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().maximize();
@@ -22,16 +23,16 @@ public class BaseTest {
     }
 
     @AfterMethod
-    public void tearDown(ITestResult result){
-        if(ITestResult.FAILURE == result.getStatus()){
-            File srcFile = ((TakesScreebshot) driver ).getScreenshotAs(OutputType.FILE);
-            try{
+    public void tearDown(ITestResult result) {
+        if (ITestResult.FAILURE == result.getStatus()) {
+            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            try {
                 FileUtils.copyFile(srcFile, new File("./failed-tests-screenshots/" + result.getName() + ".png"));
-            }catch(IOException){
-                e.printStackTRace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-        if(driver != null){
+        if (driver != null) {
             driver.quit();
         }
     }

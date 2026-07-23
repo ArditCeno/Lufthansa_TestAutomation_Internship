@@ -4,34 +4,43 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 public class CartPage extends BasePage {
-    private By cartRows = By.cssSelector(".cart-item-row");
-    private By itemPrices = By.cssSelector(".cart-item-price");
-    private By orderTotal = By.cssSelector(".order-total-amount");
-    private By quantityPlusButton = By.cssSelector(".quantity-increment");
-    private By quantityMinusButton = By.cssSelector(".quantity-decrement");
-    private By itemSubtotal = By.cssSelector(".cart-item-subtotal");
-    private By deleteButton = By.cssSelector(".button-delete-item");
-    private By emptyCartMessage = By.cssSelector(".empty-cart-text");
 
-    public CartPage (WebDriver driver){
+    private final By cartRows = By.cssSelector(".cart-item-row");
+    private final By itemPrices = By.cssSelector(".cart-item-price");
+    private final By orderTotal = By.cssSelector(".order-total-amount");
+    private final By quantityPlusButton = By.cssSelector(".quantity-increment");
+    private final By quantityMinusButton = By.cssSelector(".quantity-decrement");
+    private final By itemSubtotal = By.cssSelector(".cart-item-subtotal");
+    private final By deleteButton = By.cssSelector(".button-delete-item");
+    private final By emptyCartMessage = By.cssSelector(".empty-cart-text");
+
+    public CartPage(WebDriver driver) {
         super(driver);
     }
-    public boolean isCartPageOpened(){
+
+    public boolean isCartPageOpened() {
         return driver.getCurrentUrl().contains("/cart");
     }
+
     public int getCartRowsCount() {
         return isElementPresent(cartRows) ? getElements(cartRows).size() : 0;
     }
-    public double calculateSumOfItems(){
+
+    public double calculateSumOfItems() {
         List<WebElement> prices = getElements(itemPrices);
         double sum = 0;
-        for(WebElement price : prices){
-            sum += Double.parseDouble(price.getText().replaceAll("[^0-9.]",""));
+        for (WebElement price : prices) {
+            String cleanPrice = price.getText().replaceAll("[^0-9.]", "");
+            if (!cleanPrice.isEmpty()) {
+                sum += Double.parseDouble(cleanPrice);
+            }
         }
         return sum;
     }
+
     public double getOrderTotal() {
-        return Double.parseDouble(readText(orderTotal).replaceAll("[^0-9.]", ""));
+        String cleanTotal = readText(orderTotal).replaceAll("[^0-9.]", "");
+        return cleanTotal.isEmpty() ? 0.0 : Double.parseDouble(cleanTotal);
     }
 
     public void increaseFirstItemQuantity() {
@@ -43,11 +52,13 @@ public class CartPage extends BasePage {
     }
 
     public double getFirstItemSubtotal() {
-        return Double.parseDouble(getElements(itemSubtotal).get(0).getText().replaceAll("[^0-9.]", ""));
+        String cleanSubtotal = getElements(itemSubtotal).get(0).getText().replaceAll("[^0-9.]", "");
+        return cleanSubtotal.isEmpty() ? 0.0 : Double.parseDouble(cleanSubtotal);
     }
 
     public double getFirstItemUnitPrice() {
-        return Double.parseDouble(getElements(itemPrices).get(0).getText().replaceAll("[^0-9.]", ""));
+        String cleanPrice = getElements(itemPrices).get(0).getText().replaceAll("[^0-9.]", "");
+        return cleanPrice.isEmpty() ? 0.0 : Double.parseDouble(cleanPrice);
     }
 
     public void deleteFirstItem() {

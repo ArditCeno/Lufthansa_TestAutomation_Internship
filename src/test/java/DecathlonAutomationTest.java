@@ -6,22 +6,26 @@ import java.util.List;
 
 public class DecathlonAutomationTest extends BaseTest {
 
-    @Test(priority = 1, description = "Test 1: Search and open a product")
+    @Test(priority = 1, description = "Test 1: Search, open product and check unavailable size behavior")
     public void testScenario1_SearchAndProductDetails() {
         HomePage homePage = new HomePage(driver);
         ProductListingPage plp = new ProductListingPage(driver);
         ProductDetailPage pdp = new ProductDetailPage(driver);
 
         homePage.searchProduct("backpack");
-
         Assert.assertTrue(plp.getResultsHeadingText().contains("backpack"), "Search heading mismatch!");
         Assert.assertTrue(plp.getProductCount() > 0, "No products found for the search term!");
 
         plp.clickFirstProduct();
-
         Assert.assertFalse(pdp.getProductTitle().isEmpty(), "Product title is empty!");
         Assert.assertTrue(pdp.getProductPrice().matches("^\\$[0-9]+\\.[0-9]{2}$"), "Currency format is invalid!");
         Assert.assertTrue(pdp.isAddToCartButtonPresent(), "Add to Cart button is missing!");
+
+         driver.navigate().back();
+        plp.clickFirstProduct();
+        pdp.selectUnavailableSize();
+        Assert.assertTrue(pdp.isNotifyMeDisplayed(), "Notify Me button is not displayed!");
+        Assert.assertTrue(pdp.isSoldOutButtonDisabled(), "Sold Out button is not disabled!");
     }
 
     @Test(priority = 2, description = "Test 2: Category filters")
@@ -85,10 +89,15 @@ public class DecathlonAutomationTest extends BaseTest {
         Assert.assertEquals(cartPage.getOrderTotal(), cartPage.calculateSumOfItems(), "Sum of item prices does not equal Order Total!");
     }
 
-    @Test(priority = 5, description = "Test 5: Update cart quantities")
+    @Test(priority = 5, dependsOnMethods = {"testScenario4_AddToCartAndTotals"}, description = "Test 5: Update cart quantities")
     public void testScenario5_UpdateCartQuantities() {
-        testScenario4_AddToCartAndTotals();
+
         CartPage cartPage = new CartPage(driver);
+
+
+        if (!cartPage.isCartPageOpened()) {
+            driver.get("https://www.decathlon.com/cart");
+        }
 
         double unitPrice = cartPage.getFirstItemUnitPrice();
         double initialOrderTotal = cartPage.getOrderTotal();
@@ -102,9 +111,8 @@ public class DecathlonAutomationTest extends BaseTest {
         Assert.assertEquals(cartPage.getOrderTotal(), initialOrderTotal, "Order Total did not return to its original value!");
     }
 
-    @Test(priority = 6, description = "Test 6: Empty the cart")
+    @Test(priority = 6, dependsOnMethods = {"testScenario5_UpdateCartQuantities"}, description = "Test 6: Empty the cart")
     public void testScenario6_EmptyTheCart() {
-        testScenario4_AddToCartAndTotals();
         CartPage cartPage = new CartPage(driver);
 
         int rows = cartPage.getCartRowsCount();
