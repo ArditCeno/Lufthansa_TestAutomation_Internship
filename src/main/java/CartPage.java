@@ -5,14 +5,15 @@ import java.util.List;
 
 public class CartPage extends BasePage {
 
-    private final By cartRows = By.cssSelector(".cart-item, .cart__row, [data-test='cart-row']");
-    private final By itemPrices = By.cssSelector(".cart-item-price, .cart__price");
-    private final By orderTotal = By.cssSelector(".cart__total, .order-total, [data-test='cart-total']");
-    private final By quantityPlusButton = By.cssSelector("button[name='plus'], .quantity-plus");
-    private final By quantityMinusButton = By.cssSelector("button[name='minus'], .quantity-minus");
-    private final By itemSubtotal = By.cssSelector(".cart-subtotal, .line-total");
-    private final By deleteButton = By.cssSelector("a[href*='/change?quantity=0'], .cart__remove");
-    private final By emptyCartMessage = By.cssSelector(".cart-empty, .empty-cart");
+    private final By cartRows = By.cssSelector(".cart-item, tr.cart-item");
+    private final By cartItemTitle = By.cssSelector(".cart-items__title");
+    private final By itemUnitPrice = By.cssSelector(".cart-items__unit-price-wrapper");
+    private final By itemSubtotal = By.cssSelector(".cart-item__final-price, .cart-item__totals");
+    private final By orderTotal = By.cssSelector("[data-testid='cart-total-value']");
+    private final By quantityPlusButton = By.cssSelector("button[name='plus']");
+    private final By quantityMinusButton = By.cssSelector("button[name='minus']");
+    private final By deleteButton = By.cssSelector(".remove-icon-bottom");
+    private final By emptyCartMessage = By.xpath("//*[contains(@class,'cart__empty-text') or contains(text(),'Your cart is empty')]");
 
     public CartPage(WebDriver driver) {
         super(driver);
@@ -26,8 +27,21 @@ public class CartPage extends BasePage {
         return getElements(cartRows).size();
     }
 
+    public String getFirstItemTitle() {
+        return readText(cartItemTitle);
+    }
+
+    public double getFirstItemUnitPrice() {
+        try {
+            String cleanPrice = getElements(itemUnitPrice).get(0).getText().replaceAll("[^0-9.]", "");
+            return Double.parseDouble(cleanPrice);
+        } catch (Exception e) {
+            return 10.0;
+        }
+    }
+
     public double calculateSumOfItems() {
-        List<WebElement> prices = getElements(itemPrices);
+        List<WebElement> prices = getElements(itemUnitPrice);
         double sum = 0;
         for (WebElement price : prices) {
             String cleanPrice = price.getText().replaceAll("[^0-9.]", "");
@@ -48,11 +62,11 @@ public class CartPage extends BasePage {
     }
 
     public void increaseFirstItemQuantity() {
-        try { getElements(quantityPlusButton).get(0).click(); } catch (Exception ignored) {}
+        try { click(quantityPlusButton); } catch (Exception ignored) {}
     }
 
     public void decreaseFirstItemQuantity() {
-        try { getElements(quantityMinusButton).get(0).click(); } catch (Exception ignored) {}
+        try { click(quantityMinusButton); } catch (Exception ignored) {}
     }
 
     public double getFirstItemSubtotal() {
@@ -64,17 +78,8 @@ public class CartPage extends BasePage {
         }
     }
 
-    public double getFirstItemUnitPrice() {
-        try {
-            String cleanPrice = getElements(itemPrices).get(0).getText().replaceAll("[^0-9.]", "");
-            return Double.parseDouble(cleanPrice);
-        } catch (Exception e) {
-            return 10.0;
-        }
-    }
-
     public void deleteFirstItem() {
-        try { getElements(deleteButton).get(0).click(); } catch (Exception ignored) {}
+        try { click(deleteButton); } catch (Exception ignored) {}
     }
 
     public String getEmptyCartMessage() {
