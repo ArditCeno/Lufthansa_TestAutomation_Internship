@@ -1,20 +1,20 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
 public class ProductDetailPage extends BasePage {
 
-    private final By productTitle = By.cssSelector("h1");
-    private final By productPrice = By.cssSelector(".price, [data-test='product-price'], .de-Price");
-    private final By addToCartButton = By.cssSelector("button[name='add'], button[data-test='add-to-cart']");
-    private final By unavailableSizeOption = By.cssSelector("button[disabled], .out-of-stock, [data-available='false']");
-    private final By notifyMeButton = By.xpath("//*[contains(text(),'Notify') or contains(text(),'Sold Out')]");
-    private final By soldOutButton = By.xpath("//button[contains(text(),'Sold Out') or @disabled]");
-    private final By cartBadgeCount = By.cssSelector(".cart-count, .cart-badge, [data-test='cart-count']");
-    private final By cartIcon = By.cssSelector("a[href*='/cart']");
+    private final By productTitle = By.cssSelector("h1, .product__title");
+    private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
+    private final By productVariants = By.cssSelector(".variant-option__button-label");
+    private final By addToCartButton = By.cssSelector("[data-testid='standalone-add-to-cart']");
+    private final By unavailableSizeOption = By.cssSelector("label.disabled, button[disabled]");
+    private final By soldOutButton = By.xpath("//button[contains(text(),'Sold Out')]");
+    private final By notifyMeButton = By.xpath("//button[contains(text(),'Notify')]");
+    private final By cartBadgeCount = By.cssSelector("[data-testid='cart-count'], .cart-count-bubble");
+    private final By cartIcon = By.cssSelector("[data-testid='cart-icon']");
 
     public ProductDetailPage(WebDriver driver) {
         super(driver);
@@ -30,6 +30,15 @@ public class ProductDetailPage extends BasePage {
 
     public boolean isAddToCartButtonPresent() {
         return isElementPresent(addToCartButton);
+    }
+
+    public void selectFirstVariantIfAvailable() {
+        try {
+            List<WebElement> variants = getElements(productVariants);
+            if (!variants.isEmpty()) {
+                variants.get(0).click();
+            }
+        } catch (Exception ignored) {}
     }
 
     public void selectUnavailableSize() {
@@ -53,6 +62,7 @@ public class ProductDetailPage extends BasePage {
     }
 
     public void clickAddToCart() {
+        selectFirstVariantIfAvailable();
         click(addToCartButton);
     }
 
@@ -66,6 +76,6 @@ public class ProductDetailPage extends BasePage {
     }
 
     public void goToCart() {
-        driver.get("https://www.decathlon.com/cart");
+        click(cartIcon);
     }
 }
