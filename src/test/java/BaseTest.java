@@ -5,9 +5,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.ITestResult;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +15,10 @@ import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 
 public class BaseTest {
-    protected static WebDriver driver;
+    protected WebDriver driver;
 
-    @BeforeClass
-    public void setUpClass() {
+    @BeforeMethod
+    public void setUp() {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
@@ -33,15 +32,12 @@ public class BaseTest {
     }
 
     @AfterMethod
-    public void recordFailure(ITestResult result) {
-        if (ITestResult.FAILURE == result.getStatus()) {
-            takeScreenshot(result.getName());
-        }
-    }
-
-    @AfterClass
-    public void tearDown() {
+    public void tearDown(ITestResult result) {
         if (driver != null) {
+
+            if (ITestResult.FAILURE == result.getStatus()) {
+                takeScreenshot(result.getName());
+            }
             driver.quit();
         }
     }
@@ -52,14 +48,13 @@ public class BaseTest {
             screenshotDir.mkdirs();
         }
 
-        File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-        File destFile = new File(screenshotDir, testName + ".png");
-
         try {
+            File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destFile = new File(screenshotDir, testName + ".png");
             Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Screenshot u ruajt për testin e dështuar: " + destFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Screenshot u ruajt: " + destFile.getAbsolutePath());
+        } catch (Exception e) {
+            System.out.println("S'u realizua dot screenshot: " + e.getMessage());
         }
     }
 }
