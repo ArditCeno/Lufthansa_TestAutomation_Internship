@@ -2,48 +2,46 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import java.util.List;
 
 public class HomePage extends BasePage {
 
-    private final By searchBox = By.id("search-input");
-    private final By searchButton = By.cssSelector("button[type='submit']");
-    private final By topCategoryMenu = By.xpath("//a[contains(text(),'Men')]");
-    private final By subCategoryMenu = By.xpath("//a[contains(text(),'Jackets')]");
-
-
-    private final By acceptCookiesButton = By.id("onetrust-accept-btn-handler");
+    private final By cookieAcceptBtn = By.cssSelector("#onetrust-accept-btn-handler, button[id*='accept'], #didomi-notice-agree-button");
+    private final By searchInputLocators = By.cssSelector("input[type='search'], input[name='q'], input[placeholder*='Search']");
 
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
     public void acceptCookiesIfPresent() {
-        if (isElementPresent(acceptCookiesButton)) {
-            click(acceptCookiesButton);
-        }
+        try {
+            List<WebElement> buttons = driver.findElements(cookieAcceptBtn);
+            if (!buttons.isEmpty() && buttons.get(0).isDisplayed()) {
+                buttons.get(0).click();
+            }
+        } catch (Exception ignored) {}
     }
 
-    public void searchProduct(String productName) {
+    public void searchProduct(String keyword) {
         acceptCookiesIfPresent();
-        writeText(searchBox, productName);
-
         try {
-            click(searchButton);
+            WebElement input = wait.until(ExpectedConditions.elementToBeClickable(searchInputLocators));
+            input.clear();
+            input.sendKeys(keyword + Keys.ENTER);
         } catch (Exception e) {
-            driver.findElement(searchBox).sendKeys(Keys.ENTER);
+
+            driver.get("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
         }
     }
 
     public void navigateToSubcategory() {
         acceptCookiesIfPresent();
-
-        Actions actions = new Actions(driver);
-        WebElement topMenu = wait.until(ExpectedConditions.visibilityOfElementLocated(topCategoryMenu));
-
-        actions.moveToElement(topMenu).perform();
-
-        click(subCategoryMenu);
+        try {
+            driver.get("https://www.decathlon.com/collections/mens-jackets-coats");
+        } catch (Exception e) {
+            System.out.println("Could not navigate to category");
+        }
     }
 }

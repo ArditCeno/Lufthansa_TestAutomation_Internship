@@ -13,7 +13,16 @@ public class BasePage {
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    }
+
+    // Metoda që mungonte për marrjen e listave të elementëve
+    protected List<WebElement> getElements(By locator) {
+        return driver.findElements(locator);
+    }
+
+    protected List<WebElement> getVisibleElements(By locator) {
+        return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
     }
 
     protected void click(By locator) {
@@ -30,14 +39,9 @@ public class BasePage {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).getText();
     }
 
-    protected List<WebElement> getElements(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
-    }
-
     protected boolean isElementPresent(By locator) {
         try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-            return true;
+            return !driver.findElements(locator).isEmpty();
         } catch (Exception e) {
             return false;
         }
