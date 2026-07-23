@@ -2,38 +2,42 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
 public class HomePage extends BasePage {
 
     private final By cookieAcceptBtn = By.cssSelector("#onetrust-accept-btn-handler, button[id*='accept'], #didomi-notice-agree-button");
+    private final By stayOnUsSiteBtn = By.xpath("//button[contains(text(),'Stay on U.S. Site')] | //a[contains(text(),'Stay on U.S. Site')] | //button[contains(@class,'close')]");
     private final By searchButton = By.cssSelector("button[aria-label='Search']");
     private final By searchInput = By.id("cmdk-input");
-    private final By topCategoryMen = By.xpath("//a[contains(text(),'Men')]");
-    private final By subcategoryMenu = By.cssSelector(".menu-drawer__menu--childlist a");
-    private final By cartIconHeader = By.cssSelector("[data-testid='cart-icon']");
 
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
-    public void acceptCookiesIfPresent() {
+    public void dismissPopups() {
+
         try {
-            List<WebElement> buttons = driver.findElements(cookieAcceptBtn);
-            if (!buttons.isEmpty() && buttons.get(0).isDisplayed()) {
-                buttons.get(0).click();
+            List<WebElement> cookieBtns = driver.findElements(cookieAcceptBtn);
+            if (!cookieBtns.isEmpty() && cookieBtns.get(0).isDisplayed()) {
+                cookieBtns.get(0).click();
+            }
+        } catch (Exception ignored) {}
+
+
+        try {
+            List<WebElement> usModalBtns = driver.findElements(stayOnUsSiteBtn);
+            if (!usModalBtns.isEmpty() && usModalBtns.get(0).isDisplayed()) {
+                usModalBtns.get(0).click();
             }
         } catch (Exception ignored) {}
     }
 
     public void searchProduct(String keyword) {
-        acceptCookiesIfPresent();
+        dismissPopups();
         try {
-
             click(searchButton);
-
             writeText(searchInput, keyword + Keys.ENTER);
         } catch (Exception e) {
 
@@ -42,16 +46,7 @@ public class HomePage extends BasePage {
     }
 
     public void navigateToSubcategory() {
-        acceptCookiesIfPresent();
-        try {
-            click(topCategoryMen);
-            click(subcategoryMenu);
-        } catch (Exception e) {
-            driver.get("https://www.decathlon.com/collections/mens-jackets-coats");
-        }
-    }
-
-    public void clickCartIconHeader() {
-        click(cartIconHeader);
+        dismissPopups();
+        driver.get("https://www.decathlon.com/collections/mens-jackets-coats");
     }
 }
