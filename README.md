@@ -1,5 +1,5 @@
 # Lufthansa_TestAutomation_Internship
-# Decathlon Test Automation Mini-Project
+**Decathlon Test Automation Mini-Project**
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Selenium](https://img.shields.io/badge/Selenium-4.23.0-green)
