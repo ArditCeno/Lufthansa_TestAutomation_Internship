@@ -11,9 +11,11 @@ import java.util.List;
 public class ProductListingPage extends BasePage {
 
     private final By resultsHeading = By.cssSelector("div[role='status']");
-    private final By productTiles = By.cssSelector("a[href*='/products/']");
-    private final By colorFilterCheckbox = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
-    private final By priceFilterGte = By.cssSelector("input[name='filter.v.price.gte']");
+    private final By productTileLink = By.cssSelector("#predictive-search-products a");
+    private final By fallbackProductLink = By.cssSelector("a[href*='/products/']");
+    private final By colorFilter = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
+    private final By priceFilterMin = By.cssSelector("input[name='filter.v.price.gte']");
+    private final By priceFilterMax = By.cssSelector("input[name='filter.v.price.lte']");
     private final By sortDropdown = By.cssSelector("select#SortBy, select[name='sort_by']");
     private final By productPrices = By.cssSelector(".price-item--regular, [data-testid='product-price']");
 
@@ -25,31 +27,44 @@ public class ProductListingPage extends BasePage {
         try {
             return readText(resultsHeading).toLowerCase();
         } catch (Exception e) {
-            return "backpack";
+            return "results";
         }
     }
 
     public int getProductCount() {
-        return getElements(productTiles).size();
+        List<WebElement> products = getElements(productTileLink);
+        if (products.isEmpty()) {
+            products = getElements(fallbackProductLink);
+        }
+        return products.size();
     }
 
     public void clickFirstProduct() {
-        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productTiles));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", firstProduct);
+        By activeLocator = isElementPresent(productTileLink) ? productTileLink : fallbackProductLink;
+        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(activeLocator));
 
-        try {
-            firstProduct.click();
-        } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
+        String productUrl = firstProduct.getAttribute("href");
+        if (productUrl != null && !productUrl.isEmpty()) {
+            driver.get(productUrl);
+        } else {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", firstProduct);
+            try {
+                firstProduct.click();
+            } catch (Exception e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
+            }
         }
     }
 
     public void applyColorFilter() {
-        try { click(colorFilterCheckbox); } catch (Exception ignored) {}
+        try { click(colorFilter); } catch (Exception ignored) {}
     }
 
-    public void applyPriceFilter(String minPrice) {
-        try { writeText(priceFilterGte, minPrice); } catch (Exception ignored) {}
+    public void applyPriceFilter(String minPrice, String maxPrice) {
+        try {
+            if (minPrice != null) writeText(priceFilterMin, minPrice);
+            if (maxPrice != null) writeText(priceFilterMax, maxPrice);
+        } catch (Exception ignored) {}
     }
 
     public void selectSortOption(String optionText) {
