@@ -40,11 +40,14 @@ public class ProductListingPage extends BasePage {
     }
 
     public void clickFirstProduct() {
-        By activeLocator = isElementPresent(productTileLink) ? productTileLink : fallbackProductLink;
-        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(activeLocator));
+
+        By locatorToUse = isElementPresent(productTileLink) ? productTileLink : fallbackProductLink;
+        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(locatorToUse));
+
 
         String productUrl = firstProduct.getAttribute("href");
-        if (productUrl != null && !productUrl.isEmpty()) {
+
+        if (productUrl != null && !productUrl.trim().isEmpty()) {
             driver.get(productUrl);
         } else {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", firstProduct);
