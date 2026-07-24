@@ -56,9 +56,9 @@ public class BaseTest {
             File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File destFile = new File(screenshotDir, testName + ".png");
             Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Screenshot saved: " + destFile.getAbsolutePath());
+            System.out.println("Screenshot u ruajt në: " + destFile.getAbsolutePath());
         } catch (Exception e) {
-            System.out.println("Couldnt save screenshot: " + e.getMessage());
+            System.out.println("S'u realizua dot screenshot: " + e.getMessage());
         }
     }
 }
