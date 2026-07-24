@@ -1,18 +1,20 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
 import java.util.List;
 
 public class CartPage extends BasePage {
 
-    private final By cartRows = By.cssSelector(".cart-item, tr.cart-item, .cart-drawer__item");
-    private final By cartItemTitle = By.cssSelector(".cart-items__title, .cart-item__name");
-    private final By itemUnitPrice = By.cssSelector(".cart-items__unit-price-wrapper, .price");
+    private final By cartBadgeCount = By.cssSelector("[data-testid='cart-count'], .cart-count-bubble");
+    private final By cartItemRow = By.cssSelector(".cart-item, tr.cart-item");
+    private final By cartItemTitle = By.cssSelector(".cart-items__title");
+    private final By itemUnitPrice = By.cssSelector(".cart-items__unit-price-wrapper");
     private final By itemSubtotal = By.cssSelector(".cart-item__final-price, .cart-item__totals");
-    private final By orderTotal = By.cssSelector("[data-testid='cart-total-value'], .cart__total-value");
-    private final By quantityPlusButton = By.cssSelector("button[name='plus'], .quantity__button[name='plus']");
-    private final By quantityMinusButton = By.cssSelector("button[name='minus'], .quantity__button[name='minus']");
-    private final By deleteButton = By.cssSelector(".remove-icon-bottom, .cart-item__remove");
+    private final By orderTotal = By.cssSelector("[data-testid='cart-total-value']");
+    private final By quantityPlus = By.cssSelector("button[name='plus']");
+    private final By quantityMinus = By.cssSelector("button[name='minus']");
+    private final By deleteButton = By.cssSelector(".remove-icon-bottom");
     private final By emptyCartMessage = By.xpath("//*[contains(@class,'cart__empty-text') or contains(text(),'Your cart is empty')]");
 
     public CartPage(WebDriver driver) {
@@ -21,12 +23,21 @@ public class CartPage extends BasePage {
 
     public boolean isCartPageOpened() {
         boolean isCartUrl = driver.getCurrentUrl().contains("/cart");
-        boolean isCartDrawerPresent = !driver.findElements(By.cssSelector(".cart-drawer, #CartDrawer")).isEmpty();
-        return isCartUrl || isCartDrawerPresent;
+        boolean isCartDrawerVisible = !driver.findElements(By.cssSelector(".cart-drawer, #CartDrawer")).isEmpty();
+        return isCartUrl || isCartDrawerVisible;
+    }
+
+    public int getCartBadgeCount() {
+        try {
+            String text = readText(cartBadgeCount).replaceAll("[^0-9]", "");
+            return text.isEmpty() ? 0 : Integer.parseInt(text);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public int getCartRowsCount() {
-        return getElements(cartRows).size();
+        return getElements(cartItemRow).size();
     }
 
     public String getFirstItemTitle() {
@@ -38,20 +49,8 @@ public class CartPage extends BasePage {
             String cleanPrice = getElements(itemUnitPrice).get(0).getText().replaceAll("[^0-9.]", "");
             return Double.parseDouble(cleanPrice);
         } catch (Exception e) {
-            return 10.0;
+            return 0.0;
         }
-    }
-
-    public double calculateSumOfItems() {
-        List<WebElement> prices = getElements(itemUnitPrice);
-        double sum = 0;
-        for (WebElement price : prices) {
-            String cleanPrice = price.getText().replaceAll("[^0-9.]", "");
-            if (!cleanPrice.isEmpty()) {
-                sum += Double.parseDouble(cleanPrice);
-            }
-        }
-        return sum > 0 ? sum : getOrderTotal();
     }
 
     public double getOrderTotal() {
@@ -64,11 +63,11 @@ public class CartPage extends BasePage {
     }
 
     public void increaseFirstItemQuantity() {
-        try { click(quantityPlusButton); } catch (Exception ignored) {}
+        try { click(quantityPlus); } catch (Exception ignored) {}
     }
 
     public void decreaseFirstItemQuantity() {
-        try { click(quantityMinusButton); } catch (Exception ignored) {}
+        try { click(quantityMinus); } catch (Exception ignored) {}
     }
 
     public double getFirstItemSubtotal() {
