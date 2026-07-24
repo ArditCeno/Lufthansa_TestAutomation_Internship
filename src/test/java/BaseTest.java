@@ -9,16 +9,21 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BaseTest {
     protected WebDriver driver;
 
     @BeforeMethod
     public void setUp() {
+
+        System.setProperty("webdriver.chrome.silentOutput", "true");
+        Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
+
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
@@ -34,7 +39,6 @@ public class BaseTest {
     @AfterMethod
     public void tearDown(ITestResult result) {
         if (driver != null) {
-
             if (ITestResult.FAILURE == result.getStatus()) {
                 takeScreenshot(result.getName());
             }
@@ -52,9 +56,9 @@ public class BaseTest {
             File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File destFile = new File(screenshotDir, testName + ".png");
             Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Screenshot u ruajt: " + destFile.getAbsolutePath());
+            System.out.println("Screenshot saved: " + destFile.getAbsolutePath());
         } catch (Exception e) {
-            System.out.println("S'u realizua dot screenshot: " + e.getMessage());
+            System.out.println("Couldnt save screenshot: " + e.getMessage());
         }
     }
 }
