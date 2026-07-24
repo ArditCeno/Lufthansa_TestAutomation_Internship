@@ -14,7 +14,7 @@ public class BasePage {
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(12));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     protected List<WebElement> getElements(By locator) {
@@ -36,7 +36,6 @@ public class BasePage {
         try {
             el.click();
         } catch (Exception e) {
-
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
         }
     }
