@@ -9,12 +9,11 @@ public class ProductDetailPage extends BasePage {
     private final By productTitle = By.cssSelector("h1, .product__title");
     private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
     private final By productVariants = By.cssSelector(".variant-option__button-label");
-    private final By addToCartButton = By.cssSelector("[data-testid='standalone-add-to-cart']");
+    private final By addToCartButton = By.cssSelector("[data-testid='standalone-add-to-cart'], button[name='add']");
     private final By unavailableSizeOption = By.cssSelector("label.disabled, button[disabled]");
     private final By soldOutButton = By.xpath("//button[contains(text(),'Sold Out')]");
     private final By notifyMeButton = By.xpath("//button[contains(text(),'Notify')]");
     private final By cartBadgeCount = By.cssSelector("[data-testid='cart-count'], .cart-count-bubble");
-    private final By cartIcon = By.cssSelector("[data-testid='cart-icon']");
 
     public ProductDetailPage(WebDriver driver) {
         super(driver);
@@ -76,6 +75,6 @@ public class ProductDetailPage extends BasePage {
     }
 
     public void goToCart() {
-        click(cartIcon);
+        driver.get("https://www.decathlon.com/cart");
     }
 }

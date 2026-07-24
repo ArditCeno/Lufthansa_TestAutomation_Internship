@@ -11,7 +11,7 @@ import java.util.List;
 public class ProductListingPage extends BasePage {
 
     private final By resultsHeading = By.cssSelector("div[role='status']");
-    private final By productTiles = By.cssSelector("#predictive-search-products a, main a[href*='/products/']");
+    private final By productTiles = By.cssSelector("a[href*='/products/']");
     private final By colorFilterCheckbox = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
     private final By priceFilterGte = By.cssSelector("input[name='filter.v.price.gte']");
     private final By sortDropdown = By.cssSelector("select#SortBy, select[name='sort_by']");
@@ -34,20 +34,13 @@ public class ProductListingPage extends BasePage {
     }
 
     public void clickFirstProduct() {
-        try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(productTiles));
-            List<WebElement> tiles = getVisibleElements(productTiles);
+        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productTiles));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", firstProduct);
 
-            if (!tiles.isEmpty()) {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", tiles.get(0));
-            } else {
-                List<WebElement> fallbackLinks = getElements(By.cssSelector("a[href*='/products/']"));
-                if (!fallbackLinks.isEmpty()) {
-                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fallbackLinks.get(0));
-                }
-            }
+        try {
+            firstProduct.click();
         } catch (Exception e) {
-            driver.get("https://www.decathlon.com/collections/backpacks");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
         }
     }
 
