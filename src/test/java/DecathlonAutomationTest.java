@@ -23,6 +23,7 @@ public class DecathlonAutomationTest extends BaseTest {
 
         homePage.navigateToSubcategory();
         plp.applyColorFilter();
+        plp.applyPriceFilter("10", "100");
         Assert.assertTrue(plp.getProductCount() >= 0);
     }
 
