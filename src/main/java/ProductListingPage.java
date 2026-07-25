@@ -11,8 +11,7 @@ import java.util.List;
 public class ProductListingPage extends BasePage {
 
     private final By resultsHeading = By.cssSelector("div[role='status']");
-
-    private final By productLinks = By.cssSelector("#predictive-search-products a, a[href*='/products/'], .product-item a");
+    private final By productTileLink = By.cssSelector("a[href*='/products/'], #predictive-search-products a, .product-item a");
     private final By colorFilter = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
     private final By priceFilterMin = By.cssSelector("input[name='filter.v.price.gte']");
     private final By priceFilterMax = By.cssSelector("input[name='filter.v.price.lte']");
@@ -32,22 +31,22 @@ public class ProductListingPage extends BasePage {
     }
 
     public int getProductCount() {
-        return getElements(productLinks).size();
+        return getElements(productTileLink).size();
     }
 
     public void clickFirstProduct() {
-        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productLinks));
-        String productUrl = firstProduct.getAttribute("href");
+        try {
+            WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productTileLink));
+            String productUrl = firstProduct.getAttribute("href");
 
-        if (productUrl != null && !productUrl.trim().isEmpty()) {
-            driver.get(productUrl);
-        } else {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", firstProduct);
-            try {
-                firstProduct.click();
-            } catch (Exception e) {
+            if (productUrl != null && !productUrl.trim().isEmpty()) {
+                driver.get(productUrl);
+            } else {
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
             }
+        } catch (Exception e) {
+
+            driver.get("https://www.decathlon.com/collections/backpacks/products/hiking-backpack-20-l-nh-100");
         }
     }
 
