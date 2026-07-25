@@ -3,6 +3,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ProductDetailPage extends BasePage {
 
@@ -14,6 +15,9 @@ public class ProductDetailPage extends BasePage {
     private final By soldOutButton = By.xpath("//button[contains(text(),'Sold Out')]");
     private final By notifyMeButton = By.xpath("//button[contains(text(),'Notify')]");
 
+    private static final Pattern CURRENCY_PATTERN =
+            Pattern.compile("[\\$€£]\\s?\\d{1,3}(,\\d{3})*(\\.\\d{2})?|\\d{1,3}(,\\d{3})*(\\.\\d{2})?\\s?[\\$€£]");
+
     public ProductDetailPage(WebDriver driver) {
         super(driver);
     }
@@ -24,6 +28,11 @@ public class ProductDetailPage extends BasePage {
 
     public String getProductPrice() {
         return readText(productPrice);
+    }
+
+    public boolean priceMatchesCurrencyPattern() {
+        String price = getProductPrice();
+        return price != null && CURRENCY_PATTERN.matcher(price.trim()).find();
     }
 
     public boolean isAddToCartButtonPresent() {
@@ -39,6 +48,10 @@ public class ProductDetailPage extends BasePage {
         } catch (Exception ignored) {}
     }
 
+    public boolean hasUnavailableSizeOption() {
+        return !getElements(unavailableSizeOption).isEmpty();
+    }
+
     public void selectUnavailableSize() {
         try {
             List<WebElement> sizes = getElements(unavailableSizeOption);
@@ -50,6 +63,10 @@ public class ProductDetailPage extends BasePage {
         return isElementPresent(notifyMeButton);
     }
 
+    public boolean isSoldOutButtonDisplayed() {
+        return isElementPresent(soldOutButton);
+    }
+
     public boolean isSoldOutButtonDisabled() {
         try {
             WebElement button = driver.findElement(soldOutButton);
@@ -57,6 +74,10 @@ public class ProductDetailPage extends BasePage {
         } catch (Exception e) {
             return true;
         }
+    }
+
+    public double getUnitPrice() {
+        return parsePrice(getProductPrice());
     }
 
     public void clickAddToCart() {
