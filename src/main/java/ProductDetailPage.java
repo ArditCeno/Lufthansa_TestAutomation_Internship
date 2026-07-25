@@ -6,7 +6,8 @@ import java.util.List;
 
 public class ProductDetailPage extends BasePage {
 
-    private final By productTitle = By.cssSelector("h1, .product__title");    private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
+    private final By productTitle = By.cssSelector("h1, .product__title, .product-title, [data-testid='product-title']");
+    private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
     private final By productVariants = By.cssSelector(".variant-option__button-label");
     private final By unavailableSizeOption = By.cssSelector("label.disabled, button[disabled]");
     private final By addToCartButton = By.cssSelector("[data-testid='standalone-add-to-cart']");
