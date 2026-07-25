@@ -2,7 +2,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 
 public class HomePage extends BasePage {
@@ -14,24 +17,24 @@ public class HomePage extends BasePage {
     private final By subcategoryMenu = By.cssSelector(".menu-drawer__menu--childlist a");
 
     private final By cookieAcceptBtn = By.cssSelector("#onetrust-accept-btn-handler, button[id*='accept'], #didomi-notice-agree-button");
-    private final By stayOnUsSiteBtn = By.xpath("//button[contains(text(),'Stay on U.S. Site')] | //a[contains(text(),'Stay on U.S. Site')] | //button[contains(@class,'close')]");
+    private final By stayOnUsSiteBtn = By.xpath("//button[contains(text(),'Stay on U.S. Site')] | //a[contains(text(),'Stay on U.S. Site')] | //*[contains(text(),'Stay on U.S. Site')]");
 
     public HomePage(WebDriver driver) {
         super(driver);
     }
 
     public void dismissPopups() {
+        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
+        try {
+            WebElement usBtn = shortWait.until(ExpectedConditions.elementToBeClickable(stayOnUsSiteBtn));
+            usBtn.click();
+        } catch (Exception ignored) {}
+
         try {
             List<WebElement> cookieBtns = driver.findElements(cookieAcceptBtn);
             if (!cookieBtns.isEmpty() && cookieBtns.get(0).isDisplayed()) {
                 cookieBtns.get(0).click();
-            }
-        } catch (Exception ignored) {}
-
-        try {
-            List<WebElement> usModalBtns = driver.findElements(stayOnUsSiteBtn);
-            if (!usModalBtns.isEmpty() && usModalBtns.get(0).isDisplayed()) {
-                usModalBtns.get(0).click();
             }
         } catch (Exception ignored) {}
     }
@@ -40,10 +43,15 @@ public class HomePage extends BasePage {
         dismissPopups();
         try {
             click(searchButton);
-            writeText(searchInput, keyword + Keys.ENTER);
+            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
+            input.clear();
+            input.sendKeys(keyword);
+            input.sendKeys(Keys.ENTER);
         } catch (Exception e) {
+
             driver.get("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
         }
+        dismissPopups();
     }
 
     public void navigateToSubcategory() {
@@ -57,6 +65,7 @@ public class HomePage extends BasePage {
     }
 
     public void clickCartIcon() {
+        dismissPopups();
         click(cartIcon);
     }
 }
