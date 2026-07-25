@@ -53,48 +53,4 @@ public class BasePage {
     protected boolean isElementPresent(By locator) {
         return !driver.findElements(locator).isEmpty();
     }
-
-    protected double parsePrice(String raw) {
-        if (raw == null || raw.isBlank()) return -1;
-        String cleaned = raw.replaceAll("[^0-9.,]", "").trim();
-        if (cleaned.isEmpty()) return -1;
-        // Normalize "1,299.00" vs "1299,00" style inputs
-        if (cleaned.contains(",") && cleaned.contains(".")) {
-            cleaned = cleaned.replace(",", "");
-        } else if (cleaned.contains(",") && !cleaned.contains(".")) {
-            cleaned = cleaned.replace(",", ".");
-        }
-        try {
-            return Double.parseDouble(cleaned);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-    }
-
-    protected boolean waitForUrlContains(String fragment, int timeoutSeconds) {
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
-                    .until(ExpectedConditions.urlContains(fragment));
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    protected boolean waitForTextToChange(By locator, String previousText, int timeoutSeconds) {
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds))
-                    .until(d -> {
-                        try {
-                            String current = d.findElement(locator).getText();
-                            return current != null && !current.equals(previousText);
-                        } catch (Exception e) {
-                            return false;
-                        }
-                    });
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }
