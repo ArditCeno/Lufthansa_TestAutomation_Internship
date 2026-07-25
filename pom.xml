@@ -17,13 +17,18 @@
     </properties>
 
     <dependencies>
-
+        <!-- Selenium Java -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-http</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.testng</groupId>
@@ -31,7 +36,6 @@
             <version>${testng.version}</version>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>io.github.bonigarcia</groupId>
