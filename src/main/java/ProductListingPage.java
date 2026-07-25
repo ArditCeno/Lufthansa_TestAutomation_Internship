@@ -11,8 +11,8 @@ import java.util.List;
 public class ProductListingPage extends BasePage {
 
     private final By resultsHeading = By.cssSelector("div[role='status']");
-    private final By productTileLink = By.cssSelector("#predictive-search-products a");
-    private final By fallbackProductLink = By.cssSelector("a[href*='/products/']");
+
+    private final By productLinks = By.cssSelector("#predictive-search-products a, a[href*='/products/'], .product-item a");
     private final By colorFilter = By.xpath("//label[contains(@class,'facet-checkbox') and contains(.,'Color')]");
     private final By priceFilterMin = By.cssSelector("input[name='filter.v.price.gte']");
     private final By priceFilterMax = By.cssSelector("input[name='filter.v.price.lte']");
@@ -32,19 +32,11 @@ public class ProductListingPage extends BasePage {
     }
 
     public int getProductCount() {
-        List<WebElement> products = getElements(productTileLink);
-        if (products.isEmpty()) {
-            products = getElements(fallbackProductLink);
-        }
-        return products.size();
+        return getElements(productLinks).size();
     }
 
     public void clickFirstProduct() {
-
-        By locatorToUse = isElementPresent(productTileLink) ? productTileLink : fallbackProductLink;
-        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(locatorToUse));
-
-
+        WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productLinks));
         String productUrl = firstProduct.getAttribute("href");
 
         if (productUrl != null && !productUrl.trim().isEmpty()) {
