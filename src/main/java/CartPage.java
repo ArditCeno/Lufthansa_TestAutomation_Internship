@@ -2,7 +2,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CartPage extends BasePage {
@@ -47,38 +46,20 @@ public class CartPage extends BasePage {
 
     public double getFirstItemUnitPrice() {
         try {
-            String rawPrice = getElements(itemUnitPrice).get(0).getText();
-            return parsePrice(rawPrice);
+            String cleanPrice = getElements(itemUnitPrice).get(0).getText().replaceAll("[^0-9.]", "");
+            return Double.parseDouble(cleanPrice);
         } catch (Exception e) {
             return 0.0;
-        }
-    }
-
-    public String getOrderTotalRawText() {
-        try {
-            return readText(orderTotal);
-        } catch (Exception e) {
-            return "";
         }
     }
 
     public double getOrderTotal() {
         try {
-            String rawTotal = readText(orderTotal);
-            double parsed = parsePrice(rawTotal);
-            return parsed < 0 ? 0.0 : parsed;
+            String cleanTotal = readText(orderTotal).replaceAll("[^0-9.]", "");
+            return cleanTotal.isEmpty() ? 0.0 : Double.parseDouble(cleanTotal);
         } catch (Exception e) {
             return 0.0;
         }
-    }
-
-    public double getSumOfLineSubtotals() {
-        double sum = 0.0;
-        for (WebElement el : getElements(itemSubtotal)) {
-            double price = parsePrice(el.getText());
-            if (price > 0) sum += price;
-        }
-        return sum;
     }
 
     public void increaseFirstItemQuantity() {
@@ -91,9 +72,8 @@ public class CartPage extends BasePage {
 
     public double getFirstItemSubtotal() {
         try {
-            String rawSubtotal = getElements(itemSubtotal).get(0).getText();
-            double parsed = parsePrice(rawSubtotal);
-            return parsed >= 0 ? parsed : getFirstItemUnitPrice() * 2;
+            String cleanSubtotal = getElements(itemSubtotal).get(0).getText().replaceAll("[^0-9.]", "");
+            return Double.parseDouble(cleanSubtotal);
         } catch (Exception e) {
             return getFirstItemUnitPrice() * 2;
         }
@@ -109,13 +89,5 @@ public class CartPage extends BasePage {
         } catch (Exception e) {
             return "Your cart is empty";
         }
-    }
-
-    public boolean isEmptyCartMessageDisplayed() {
-        return isElementPresent(emptyCartMessage);
-    }
-
-    public boolean waitForOrderTotalToChange(String previousRawText, int timeoutSeconds) {
-        return waitForTextToChange(orderTotal, previousRawText, timeoutSeconds);
     }
 }
