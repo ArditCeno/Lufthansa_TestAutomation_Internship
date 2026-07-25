@@ -29,7 +29,8 @@ public class BaseTest {
         options.addArguments("--start-maximized");
         options.addArguments("--disable-notifications");
         options.addArguments("--remote-allow-origins=*");
-        // Konfigurime shtesë për Chrome 150+ që të mos bllokojë elementët DOM
+
+
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--disable-popup-blocking");
 
