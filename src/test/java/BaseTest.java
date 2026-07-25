@@ -20,7 +20,6 @@ public class BaseTest {
 
     @BeforeMethod
     public void setUp() {
-
         System.setProperty("webdriver.chrome.silentOutput", "true");
         Logger.getLogger("org.openqa.selenium").setLevel(Level.OFF);
 
@@ -30,9 +29,12 @@ public class BaseTest {
         options.addArguments("--start-maximized");
         options.addArguments("--disable-notifications");
         options.addArguments("--remote-allow-origins=*");
+        // Konfigurime shtesë për Chrome 150+ që të mos bllokojë elementët DOM
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-popup-blocking");
 
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(8));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.get("https://www.decathlon.com/");
     }
 
