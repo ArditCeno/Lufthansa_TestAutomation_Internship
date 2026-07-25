@@ -13,8 +13,6 @@ public class HomePage extends BasePage {
     private final By topLevelCategory = By.xpath("//a[contains(text(),'Men')]");
     private final By subcategoryMenu = By.cssSelector(".menu-drawer__menu--childlist a");
 
-    private final By headerCartBadge = By.cssSelector("[data-testid='cart-count'], .cart-count-bubble");
-
     private final By cookieAcceptBtn = By.cssSelector("#onetrust-accept-btn-handler, button[id*='accept'], #didomi-notice-agree-button");
     private final By stayOnUsSiteBtn = By.xpath("//button[contains(text(),'Stay on U.S. Site')] | //a[contains(text(),'Stay on U.S. Site')] | //button[contains(@class,'close')]");
 
@@ -60,16 +58,5 @@ public class HomePage extends BasePage {
 
     public void clickCartIcon() {
         click(cartIcon);
-    }
-
-    public int getHeaderCartBadgeCount() {
-        try {
-            List<WebElement> badges = getElements(headerCartBadge);
-            if (badges.isEmpty()) return 0;
-            String text = badges.get(0).getText().replaceAll("[^0-9]", "");
-            return text.isEmpty() ? 0 : Integer.parseInt(text);
-        } catch (Exception e) {
-            return 0;
-        }
     }
 }
