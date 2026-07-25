@@ -2,10 +2,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
 
 public class HomePage extends BasePage {
@@ -24,11 +21,11 @@ public class HomePage extends BasePage {
     }
 
     public void dismissPopups() {
-        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-
         try {
-            WebElement usBtn = shortWait.until(ExpectedConditions.elementToBeClickable(stayOnUsSiteBtn));
-            usBtn.click();
+            List<WebElement> usModalBtns = driver.findElements(stayOnUsSiteBtn);
+            if (!usModalBtns.isEmpty() && usModalBtns.get(0).isDisplayed()) {
+                usModalBtns.get(0).click();
+            }
         } catch (Exception ignored) {}
 
         try {
@@ -41,16 +38,8 @@ public class HomePage extends BasePage {
 
     public void searchProduct(String keyword) {
         dismissPopups();
-        try {
-            click(searchButton);
-            WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(searchInput));
-            input.clear();
-            input.sendKeys(keyword);
-            input.sendKeys(Keys.ENTER);
-        } catch (Exception e) {
 
-            driver.get("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
-        }
+        driver.get("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
         dismissPopups();
     }
 
