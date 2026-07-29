@@ -2,11 +2,17 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
 import java.util.List;
 
 public class ProductDetailPage extends BasePage {
 
-    private final By productTitle = By.cssSelector("h1, .product__title, .product-title, [data-testid='product-title']");
+    private final By[] productTitleCandidates = {
+            By.cssSelector("[data-testid='product-information-details'] h3"),
+            By.cssSelector(".view-product-title"),
+            By.cssSelector("[data-testid='sticky-product-title']"),
+            By.cssSelector("h1, .product__title, .product-title, [data-testid='product-title']")
+    };
     private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
     private final By productVariants = By.cssSelector(".variant-option__button-label");
     private final By unavailableSizeOption = By.cssSelector("label.disabled, button[disabled]");
@@ -19,7 +25,22 @@ public class ProductDetailPage extends BasePage {
     }
 
     public String getProductTitle() {
-        return readText(productTitle);
+        for (int i = 0; i < productTitleCandidates.length; i++) {
+
+            Duration timeout = (i == 0) ? DEFAULT_TIMEOUT : Duration.ZERO;
+            for (WebElement element : getElementsWhenPresent(productTitleCandidates[i], timeout)) {
+                String text = element.getText().trim();
+                if (text.isEmpty()) {
+
+                    String content = element.getDomProperty("textContent");
+                    text = (content == null) ? "" : content.trim();
+                }
+                if (!text.isEmpty()) {
+                    return text;
+                }
+            }
+        }
+        return "";
     }
 
     public String getProductPrice() {
@@ -32,7 +53,7 @@ public class ProductDetailPage extends BasePage {
 
     public void selectFirstVariantIfAvailable() {
         try {
-            List<WebElement> variants = getElements(productVariants);
+            List<WebElement> variants = getElementsWhenPresent(productVariants, SHORT_TIMEOUT);
             if (!variants.isEmpty()) {
                 variants.get(0).click();
             }
@@ -41,7 +62,7 @@ public class ProductDetailPage extends BasePage {
 
     public void selectUnavailableSize() {
         try {
-            List<WebElement> sizes = getElements(unavailableSizeOption);
+            List<WebElement> sizes = getElementsWhenPresent(unavailableSizeOption, SHORT_TIMEOUT);
             if (!sizes.isEmpty()) sizes.get(0).click();
         } catch (Exception ignored) {}
     }
@@ -60,11 +81,13 @@ public class ProductDetailPage extends BasePage {
     }
 
     public void clickAddToCart() {
+
+        dismissBlockingPopups();
         selectFirstVariantIfAvailable();
         click(addToCartButton);
     }
 
     public void goToCart() {
-        driver.get("https://www.decathlon.com/cart");
+        navigateTo("https://www.decathlon.com/cart");
     }
 }
