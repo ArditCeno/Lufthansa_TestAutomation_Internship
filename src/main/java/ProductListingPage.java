@@ -12,8 +12,10 @@ import java.util.List;
 public class ProductListingPage extends BasePage {
 
     private final By resultsHeading = By.cssSelector("div[role='status']");
-    private final By productTileLink = By.cssSelector("a[href*='/products/'], #predictive-search-products a, .product-item a");
 
+    private final By productTileLink = By.cssSelector(
+            "a[href*='/products/'], #predictive-search-products a, .product-item a, [data-testid*='product-card'] a, .grid__item a[href*='/products/']"
+    );
 
     private final By facetSummary = By.cssSelector("summary.facets__summary");
     private final By colorSwatch = By.cssSelector("span.swatch--filter");
@@ -35,7 +37,12 @@ public class ProductListingPage extends BasePage {
     }
 
     public int getProductCount() {
-        return getElementsWhenPresent(productTileLink, DEFAULT_TIMEOUT).size();
+
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(productTileLink));
+        } catch (Exception ignored) {}
+
+        return getElements(productTileLink).size();
     }
 
     public void clickFirstProduct() {
@@ -49,11 +56,9 @@ public class ProductListingPage extends BasePage {
                 ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
             }
         } catch (Exception e) {
-
             driver.get("https://www.decathlon.com/collections/backpacks/products/hiking-backpack-20-l-nh-100");
         }
     }
-
 
     private boolean openFacet(String name) {
         dismissBlockingPopups();
@@ -155,7 +160,6 @@ public class ProductListingPage extends BasePage {
 
         for (WebElement element : priceElements) {
             try {
-
                 if (!element.isDisplayed()) continue;
                 String cleanPrice = element.getText().replaceAll("[^0-9.]", "");
                 if (!cleanPrice.isEmpty()) {

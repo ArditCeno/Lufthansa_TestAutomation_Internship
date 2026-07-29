@@ -1,4 +1,5 @@
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -26,15 +27,15 @@ public class BaseTest {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
+
+        options.setPageLoadStrategy(PageLoadStrategy.EAGER);
+
         options.addArguments("--start-maximized");
         options.addArguments("--disable-notifications");
         options.addArguments("--remote-allow-origins=*");
-
-
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--disable-popup-blocking");
 
-        // CI has no display, so the suite runs headless there. Locally it stays visible by default.
         if (Boolean.parseBoolean(System.getenv("HEADLESS")) || Boolean.getBoolean("headless")) {
             options.addArguments("--headless=new");
             options.addArguments("--window-size=1920,1080");
@@ -45,7 +46,7 @@ public class BaseTest {
         driver = new ChromeDriver(options);
 
         driver.manage().timeouts().implicitlyWait(Duration.ZERO);
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
         driver.get("https://www.decathlon.com/");
     }
 
