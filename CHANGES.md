@@ -171,7 +171,7 @@ These are test-design issues rather than bugs, so the assertions were left as th
    of this immediately.
 
 3. **A fresh Chrome per test method.** `@BeforeMethod` launches and quits a browser six times.
-   Sharing a driver where scenarios allow it would cut the runtime meaningfully.
+   Sharing a driver where scenarios allow it would cut the runtime meaningfully..
 
 4. **Selector fragility.** Several of these are Shopify theme classes that will move again. The
    `data-testid` attributes on the site are the more stable choice where they exist.
