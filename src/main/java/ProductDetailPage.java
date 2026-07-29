@@ -18,15 +18,13 @@ public class ProductDetailPage extends BasePage {
 
     private final By productPrice = By.cssSelector(".price-item--regular, [data-testid='price']");
 
-    // Lokatore te zgjeruar per opsionet e masave/varianteve
     private final By productVariants = By.cssSelector(
             ".variant-option__button-label, [data-testid*='variant'], fieldset label:not(.disabled), .product-form__input input + label"
     );
     private final By unavailableSizeOption = By.cssSelector("label.disabled, button[disabled]");
 
-    // Lokatore fleksibel per butonin Add to Cart
     private final By addToCartButton = By.cssSelector(
-            "[data-testid='standalone-add-to-cart'], button[name='add'], button.product-form__submit, .add-to-cart-button"
+            "[data-testid='standalone-add-to-cart'], button[name='add'], button.product-form__submit, .add-to-cart-button, button[aria-label*='Add to cart'], input[type='submit'][name='add']"
     );
     private final By soldOutButton = By.xpath("//button[contains(text(),'Sold Out')]");
     private final By notifyMeButton = By.xpath("//button[contains(text(),'Notify')]");
@@ -95,16 +93,22 @@ public class ProductDetailPage extends BasePage {
 
     public void clickAddToCart() {
         dismissBlockingPopups();
-
         selectFirstVariantIfAvailable();
 
-        try {
-            WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(addToCartButton));
-            btn.click();
-        } catch (Exception e) {
+        List<WebElement> buttons = getElementsWhenPresent(addToCartButton, DEFAULT_TIMEOUT);
+        if (!buttons.isEmpty()) {
+            WebElement btn = buttons.get(0);
+            try {
+                wait.until(ExpectedConditions.elementToBeClickable(btn)).click();
+            } catch (Exception e) {
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+            }
+        } else {
 
-            WebElement btn = driver.findElement(addToCartButton);
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
+            try {
+                WebElement formSubmit = driver.findElement(By.cssSelector("form[action*='/cart/add'] [type='submit']"));
+                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", formSubmit);
+            } catch (Exception ignored) {}
         }
     }
 
