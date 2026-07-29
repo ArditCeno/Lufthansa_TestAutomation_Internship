@@ -21,35 +21,21 @@ public class HomePage extends BasePage {
     }
 
     public void dismissPopups() {
-        try {
-            List<WebElement> usModalBtns = driver.findElements(stayOnUsSiteBtn);
-            if (!usModalBtns.isEmpty() && usModalBtns.get(0).isDisplayed()) {
-                usModalBtns.get(0).click();
-            }
-        } catch (Exception ignored) {}
-
-        try {
-            List<WebElement> cookieBtns = driver.findElements(cookieAcceptBtn);
-            if (!cookieBtns.isEmpty() && cookieBtns.get(0).isDisplayed()) {
-                cookieBtns.get(0).click();
-            }
-        } catch (Exception ignored) {}
+        clickFirstIfDisplayed(stayOnUsSiteBtn);
+        dismissBlockingPopups();
     }
 
     public void searchProduct(String keyword) {
         dismissPopups();
-
-        driver.get("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
-        dismissPopups();
+        navigateTo("https://www.decathlon.com/search?q=" + keyword.replace(" ", "+"));
     }
 
     public void navigateToSubcategory() {
         dismissPopups();
-        try {
-            click(topLevelCategory);
-            click(subcategoryMenu);
-        } catch (Exception e) {
-            driver.get("https://www.decathlon.com/collections/mens-jackets-coats");
+        if (!clickIfPresent(topLevelCategory) || !clickIfPresent(subcategoryMenu)) {
+
+
+            navigateTo("https://www.decathlon.com/collections/mens-jackets");
         }
     }
 
