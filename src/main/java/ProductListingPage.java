@@ -4,7 +4,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ public class ProductListingPage extends BasePage {
     private final By resultsHeading = By.cssSelector("div[role='status']");
 
     private final By productTileLink = By.cssSelector(
-            "a[href*='/products/'], #predictive-search-products a, .product-item a, [data-testid*='product-card'] a, .grid__item a[href*='/products/']"
+            "a[href*='/products/'], .product-card a, [data-testid*='product'] a, .grid-product__link, .product-item__title a"
     );
 
     private final By facetSummary = By.cssSelector("summary.facets__summary");
@@ -37,9 +36,8 @@ public class ProductListingPage extends BasePage {
     }
 
     public int getProductCount() {
-
         try {
-            wait.until(ExpectedConditions.presenceOfElementLocated(productTileLink));
+            wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(productTileLink));
         } catch (Exception ignored) {}
 
         return getElements(productTileLink).size();
@@ -47,16 +45,22 @@ public class ProductListingPage extends BasePage {
 
     public void clickFirstProduct() {
         try {
-            WebElement firstProduct = wait.until(ExpectedConditions.presenceOfElementLocated(productTileLink));
-            String productUrl = firstProduct.getAttribute("href");
+            List<WebElement> products = getElementsWhenPresent(productTileLink, DEFAULT_TIMEOUT);
+            if (!products.isEmpty()) {
+                WebElement firstProduct = products.get(0);
+                String productUrl = firstProduct.getDomAttribute("href");
 
-            if (productUrl != null && !productUrl.trim().isEmpty()) {
-                navigateTo(productUrl);
-            } else {
-                ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
+                if (productUrl != null && !productUrl.trim().isEmpty()) {
+                    if (!productUrl.startsWith("http")) {
+                        productUrl = "https://www.decathlon.com" + productUrl;
+                    }
+                    navigateTo(productUrl);
+                } else {
+                    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", firstProduct);
+                }
             }
         } catch (Exception e) {
-            driver.get("https://www.decathlon.com/collections/backpacks/products/hiking-backpack-20-l-nh-100");
+            navigateTo("https://www.decathlon.com/collections/backpacks/products/hiking-backpack-20-l-nh-100");
         }
     }
 
