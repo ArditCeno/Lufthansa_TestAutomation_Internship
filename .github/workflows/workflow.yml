@@ -48,10 +48,77 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: Selenium Tests
+
+          
+          name: Test Results
           path: target/surefire-reports/TEST-*.xml
           reporter: java-junit
           fail-on-error: "false"
+
+      - name: Test summary
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import glob, os, re, xml.etree.ElementTree as ET
+
+          total = passed = failed = skipped = 0
+          duration = 0.0
+          rows = []
+
+          def pretty(name):
+              name = name.replace('testScenario', '')
+              number, _, rest = name.partition('_')
+              return f"{number}. {re.sub(r'(?<!^)(?=[A-Z])', ' ', rest)}"
+
+          for path in sorted(glob.glob('target/surefire-reports/TEST-*.xml')):
+              root = ET.parse(path).getroot()
+              for suite in root.iter('testsuite'):
+                  duration += float(suite.get('time') or 0)
+              for case in root.iter('testcase'):
+                  total += 1
+                  seconds = float(case.get('time') or 0)
+                  problem = case.find('failure')
+                  if problem is None:
+                      problem = case.find('error')
+                  if problem is not None:
+                      failed += 1
+                      status = ':x:'
+                      message = (problem.get('message') or '').strip()
+                      message = message.splitlines()[0][:150] if message else 'see logs'
+                  elif case.find('skipped') is not None:
+                      skipped += 1
+                      status = ':fast_forward:'
+                      message = ''
+                  else:
+                      passed += 1
+                      status = ':white_check_mark:'
+                      message = ''
+                  rows.append((pretty(case.get('name', '?')), status, seconds, message))
+
+          verdict = ':white_check_mark: Pass' if failed == 0 else ':x: Fail'
+          lines = [
+              '## Selenium Tests',
+              '',
+              '| Result | Tests | Passed | Failed | Skipped | Time |',
+              '|---|---|---|---|---|---|',
+              f'| {verdict} | {total} | {passed} | {failed} | {skipped} | {duration:.0f}s |',
+              '',
+              '### Scenarios',
+              '',
+              '| Scenario | Status | Time |',
+              '|---|---|---|',
+          ]
+          lines += [f'| {name} | {status} | {seconds:.0f}s |' for name, status, seconds, _ in rows]
+
+          failures = [(name, message) for name, status, _, message in rows if status == ':x:']
+          if failures:
+              lines += ['', '### Failures', '']
+              for name, message in failures:
+                  lines += [f'**{name}**', '', '```', message, '```', '']
+
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as handle:
+              handle.write('\n'.join(lines) + '\n')
+          PY
 
       - name: Upload failure screenshots
         if: always()
