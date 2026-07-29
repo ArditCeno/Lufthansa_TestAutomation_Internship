@@ -44,7 +44,7 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductDetailPage pdp = new ProductDetailPage(driver);
         CartPage cartPage = new CartPage(driver);
 
-        homePage.searchProduct("socks");
+        homePage.searchProduct("water bottle");
         plp.clickFirstProduct();
         pdp.clickAddToCart();
         pdp.goToCart();
@@ -59,7 +59,7 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductDetailPage pdp = new ProductDetailPage(driver);
         CartPage cartPage = new CartPage(driver);
 
-        homePage.searchProduct("socks");
+        homePage.searchProduct("water bottle");
         plp.clickFirstProduct();
         pdp.clickAddToCart();
         pdp.goToCart();
@@ -75,7 +75,7 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductDetailPage pdp = new ProductDetailPage(driver);
         CartPage cartPage = new CartPage(driver);
 
-        homePage.searchProduct("socks");
+        homePage.searchProduct("water bottle");
         plp.clickFirstProduct();
         pdp.clickAddToCart();
         pdp.goToCart();
