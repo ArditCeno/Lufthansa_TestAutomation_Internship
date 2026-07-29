@@ -34,8 +34,18 @@ public class BaseTest {
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.addArguments("--disable-popup-blocking");
 
+        // CI has no display, so the suite runs headless there. Locally it stays visible by default.
+        if (Boolean.parseBoolean(System.getenv("HEADLESS")) || Boolean.getBoolean("headless")) {
+            options.addArguments("--headless=new");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+        }
+
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        driver.manage().timeouts().implicitlyWait(Duration.ZERO);
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
         driver.get("https://www.decathlon.com/");
     }
 
@@ -59,9 +69,9 @@ public class BaseTest {
             File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File destFile = new File(screenshotDir, testName + ".png");
             Files.copy(srcFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Screenshot u ruajt në: " + destFile.getAbsolutePath());
+            System.out.println("Screenshot u ruajt : " + destFile.getAbsolutePath());
         } catch (Exception e) {
-            System.out.println("S'u realizua dot screenshot: " + e.getMessage());
+            System.out.println("Su realizua dot screenshot: " + e.getMessage());
         }
     }
 }
