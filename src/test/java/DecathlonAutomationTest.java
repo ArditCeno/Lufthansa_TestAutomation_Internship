@@ -10,10 +10,10 @@ public class DecathlonAutomationTest extends BaseTest {
         ProductDetailPage pdp = new ProductDetailPage(driver);
 
         homePage.searchProduct("backpack");
-        Assert.assertTrue(plp.getProductCount() > 0, "No products were found!");
+        Assert.assertTrue(plp.getProductCount() > 0, "No products were found");
 
         plp.clickFirstProduct();
-        Assert.assertFalse(pdp.getProductTitle().isEmpty(), "Product title is empty!");
+        Assert.assertFalse(pdp.getProductTitle().isEmpty(), "Product title is empty");
     }
 
     @Test(priority = 2, description = "Test 2: Category filters")
